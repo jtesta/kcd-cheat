@@ -31,15 +31,23 @@ function cheat:find_perk(searchKey, returnAll)
       perk_id = rowInfo.perk_id
       perk_name = rowInfo.perk_name
 
-      if returnAll then
-        local perk = {}
-        perk.perk_id = perk_id
-        perk.perk_name = perk_name
-        table.insert(perks, perk)
-      end
+      local perk = {}
+      perk.perk_id = perk_id
+      perk.perk_name = perk_name
+      table.insert(perks, perk)
 
-      cheat:logInfo("Found perk [%s] with id [%s].", tostring(perk_name), tostring(perk_id))
+      cheat:logDebug("Found perk [%s] with id [%s].", tostring(perk_name), tostring(perk_id))
     end
+  end
+
+  -- Sort perks by name (case insensitive).
+  table.sort(perks, function(perk1, perk2)
+    return cheat:toUpper(tostring(perk1.perk_name)) < cheat:toUpper(tostring(perk2.perk_name))
+  end)
+
+  -- Print the sorted list of perks.
+  for i = 1, #perks do
+    cheat:logInfo("Found perk [%s] with id [%s].", tostring(perks[i].perk_name), tostring(perks[i].perk_id))
   end
 
   if returnAll then
