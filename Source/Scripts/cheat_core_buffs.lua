@@ -10,6 +10,7 @@ function cheat:find_buff(searchKey, returnAll)
   local buff_id = nil
   local buff_name = nil
   local buffs = {}
+  local sorted_buffs = {}
 
   for i=0,rows do
     local buffInfo = Database.GetTableLine(tableName, i)
@@ -30,14 +31,23 @@ function cheat:find_buff(searchKey, returnAll)
     if found then
       buff_id = buffInfo.buff_id
       buff_name = buffInfo.buff_name
-      if returnAll then
-        local buff = {}
-        buff.buff_id = buff_id
-        buff.buff_name = buff_name
-        buffs[buff_id] = buff
-      end
-      cheat:logInfo("Found buff [%s] with id [%s].", tostring(buff_name), tostring(buff_id))
+      local buff = {}
+      buff.buff_id = buff_id
+      buff.buff_name = buff_name
+      buffs[buff_id] = buff
+      table.insert(sorted_buffs, buff)
+      cheat:logDebug("Found buff [%s] with id [%s].", tostring(buff_name), tostring(buff_id))
     end
+  end
+
+  -- Sort buffs by name (case insensitive).
+  table.sort(sorted_buffs, function(buff1, buff2)
+    return cheat:toUpper(tostring(buff1.buff_name)) < cheat:toUpper(tostring(buff2.buff_name))
+  end)
+
+  -- Print the sorted list of buffs.
+  for i = 1, #sorted_buffs do
+    cheat:logInfo("Found buff [%s] with id [%s].", tostring(sorted_buffs[i].buff_name), tostring(sorted_buffs[i].buff_id))
   end
 
   if returnAll then
